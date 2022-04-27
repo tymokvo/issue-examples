@@ -12,6 +12,7 @@ namespace HostApp
     }
     public interface IPlugin
     {
+        string Name {get;}
         Result Execute(CommandData data);
     }
 }

@@ -1,1 +1,1 @@
-PluginLib\bin\Debug\PluginLib.dll
+PluginLib\bin\Debug\netframework4.8\PluginLib.dll
