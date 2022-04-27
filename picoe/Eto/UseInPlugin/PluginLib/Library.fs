@@ -34,11 +34,10 @@ type Attach() =
         member z.Name = "Attach"
         member z.Execute (data: CommandData) =
             let a = match Application.Instance with
-                    | null -> (new Application()).Attach()
+                    | null -> (new Application(Eto.Platforms.WinForms)).Attach()
                     | a -> a
 
             let f = new Form()
             f.Title <- data.Content
             // a.Run(f) // Throws null reference exception
-            a.Dispose()
             Result.Success
