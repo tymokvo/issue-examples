@@ -16,20 +16,40 @@ dotnet build
 dotnet run --project HostApp
 ```
 
-This will put you into the main loop of the console app. In order, enter:
+This will put you into the main loop of the console app.
+
+The F# library has multple plugin types that demonstrate different behaviors. To
+use the `Instantiate` plugin, enter:
+
 ```console
-FSharpPlugin
+Instantiate
 y
-FSharpPlugin
+Instantiate
 ```
 
+(Note that calling `.Run()` on the form fails with a null reference exception,
+but that is not relevant here)
+
 ## Expected result
+
+First execution succeeds, second fails with:
 
 ```console
 System.InvalidOperationException: The Eto.Forms Application is already created.
    at Eto.Forms.Application.InitializePlatform(Platform platform)
    at Eto.Forms.Application..ctor(Platform platform)
    at PluginLib.MyPlugin.HostApp.IPlugin.Execute(CommandData data)
+```
+
+or
+
+```console
+System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'Eto.Forms.Application'.
+   at Eto.Widget.get_Handler()
+   at Eto.Widget.Dispose(Boolean disposing)
+   at Eto.Widget.Dispose()
+   at PluginLib.CheckInstance.HostApp.IPlugin.Execute(CommandData data)
 ```
 
 ## Desired result
