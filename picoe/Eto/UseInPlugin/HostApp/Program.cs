@@ -10,15 +10,19 @@ namespace HostApp
     class Program
     {
         private static Dictionary<string, IPlugin> Plugins = new Dictionary<string, IPlugin>();
+        private static string PluginPath = "";
         static AssemblyName SelfName()
         {
             return typeof(Program).Assembly.GetName();
         }
+
+        [STAThread]
         static void Main(string[] args)
         {
             var cwd = Directory.GetCurrentDirectory();
             try
             {
+                AppDomain.CurrentDomain.AssemblyResolve += Program.HandleAssemblyResolve;
                 var pluginPaths = File
                     .ReadAllLines("pluginpaths.txt")
                     .Select((p) => Path.Combine(cwd, p));
@@ -29,12 +33,17 @@ namespace HostApp
                     if (File.Exists(p))
                     {
                         var a = Assembly.LoadFile(p);
+                        var refs = a.GetReferencedAssemblies();
+                        var refNames = string.Join("; ", refs.Select((ra) => ra.FullName));
+                        Console.WriteLine($"{refNames}");
+
                         foreach (Type t in a.GetTypes())
                         {
                             if (typeof(IPlugin).IsAssignableFrom(t))
                             {
                                 IPlugin plugin = Activator.CreateInstance(t) as IPlugin;
                                 Program.Plugins.Add(plugin.Name, plugin);
+                                Program.PluginPath = Path.GetDirectoryName(p);
                             }
                         }
 
@@ -76,9 +85,26 @@ namespace HostApp
             }
         }
 
-        static Dictionary<string, IPlugin> LoadPlugin(string path)
+        private static Assembly HandleAssemblyResolve(object sender, ResolveEventArgs args)
         {
-            return new Dictionary<string, IPlugin>();
+            if (args.Name.Contains(".resources"))
+            {
+                return typeof(Program).Assembly;
+            }
+
+            var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault((a) => a.FullName == args.Name);
+            if (assembly != null)
+            {
+                return assembly;
+            }
+
+            string fileName = args.Name.Split(',')[0] + ".dll";
+
+            string fullPath = Path.Combine(Program.PluginPath, fileName);
+
+            Console.WriteLine($"{fullPath}");
+
+            return Assembly.LoadFrom(fullPath);
         }
     }
 }

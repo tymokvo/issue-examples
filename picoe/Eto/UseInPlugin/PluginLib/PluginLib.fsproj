@@ -13,4 +13,9 @@
     <Compile Include="Library.fs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Eto.Forms" Version="2.6.1" />
+    <PackageReference Include="Eto.Platform.Windows" Version="2.6.1" />
+  </ItemGroup>
+
 </Project>
