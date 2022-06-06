@@ -1,3 +1,5 @@
+// https://fsharp.slack.com/archives/C1R50TKEU/p1654496427111979
+
 type Dep<'a> =
     abstract member Get: 'a
 
